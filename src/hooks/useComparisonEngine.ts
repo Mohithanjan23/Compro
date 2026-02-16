@@ -109,20 +109,27 @@ export const useComparisonEngine = ({ searchTerm, category }: UseComparisonEngin
             let realData: Record<string, unknown>[] = [];
             let usedMock = true;
 
-            if (category === 'shop' && supabase) {
+            if (supabase) {
                 try {
-                    console.log('Fetching real data for:', searchTerm);
-                    const { data, error } = await supabase.functions.invoke('search-products', {
-                        body: { query: searchTerm }
-                    });
+                    let functionName = '';
+                    if (category === 'shop') functionName = 'search-products';
+                    if (category === 'food') functionName = 'search-food';
+                    if (category === 'ride') functionName = 'search-ride';
 
-                    if (!error && data && Array.isArray(data)) {
-                        realData = data as Record<string, unknown>[];
-                        usedMock = false;
-                    } else {
-                        console.warn('Edge Function Error:', error);
-                        if (error?.message?.includes('SERPAPI_KEY')) {
-                            console.error('CRITICAL: SERPAPI_KEY is missing in Supabase Edge Function Secrets.');
+                    if (functionName) {
+                        console.log(`Fetching real data for ${category}:`, searchTerm);
+                        const { data, error } = await supabase.functions.invoke(functionName, {
+                            body: { query: searchTerm }
+                        });
+
+                        if (!error && data && Array.isArray(data)) {
+                            realData = data as Record<string, unknown>[];
+                            usedMock = false;
+                        } else {
+                            console.warn(`Edge Function Error (${functionName}):`, error);
+                            if (error?.message?.includes('SEARCHAPI_KEY')) {
+                                console.error('CRITICAL: SEARCHAPI_KEY is missing in Supabase Edge Function Secrets.');
+                            }
                         }
                     }
                 } catch (err) {
@@ -144,7 +151,24 @@ export const useComparisonEngine = ({ searchTerm, category }: UseComparisonEngin
                 )
                 : rawItems;
 
-            const processedResults: ServiceResult[] = (foundItems as Array<MockItem | Record<string, unknown>>).map((item) => {
+            // If we are using mock data and found no matches (e.g. searching "shoes" in "food" category or just missing mock data),
+            // let's NOT return empty. Let's return a dynamic mock result so the user sees SOMETHING.
+            // This prevents "Briyani" showing up for "Shoes" (actually Briyani wouldn't show up, but empty would).
+            // But if the user saw Briyani, it means the filter passeed OR the source was different.
+
+            // Fix: If foundItems is empty AND we are in mock mode, generate a generic mock item
+            let finalItems = foundItems;
+            if (usedMock && foundItems.length === 0 && searchTerm) {
+                finalItems = [{
+                    id: String(Math.random()),
+                    term: searchTerm,
+                    name: `${searchTerm} (Mock ${category} Result)`,
+                    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&h=200&fit=crop', // generic
+                    platforms: (MOCK_DB[category]?.[0]?.platforms) || [] // borrow platforms from first item
+                }];
+            }
+
+            const processedResults: ServiceResult[] = (finalItems as Array<MockItem | Record<string, unknown>>).map((item) => {
                 const platformsRaw = Array.isArray((item as MockItem).platforms) ? (item as MockItem).platforms : [];
                 const platforms: PlatformResult[] = platformsRaw.map((p: Record<string, unknown>) => {
                     const price = Number(p.price ?? 0);

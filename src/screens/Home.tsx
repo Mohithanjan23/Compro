@@ -8,15 +8,13 @@ import {
     ArrowRight,
     Zap,
     ShieldCheck,
-    Mail
+    Lock
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 import { useSearch } from '../context/SearchContext';
 import { motion } from 'framer-motion';
 
 export const Home = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
     const {
         searchTerm,
         setSearchTerm,
@@ -33,21 +31,21 @@ export const Home = () => {
 
     const features = [
         {
-            icon: Mail,
-            title: "Track Everything",
-            desc: "Connect your email to auto-track every order in one place.",
+            icon: ShieldCheck,
+            title: "Unbiased Reviews",
+            desc: "We aggregate real reviews from Reddit, YouTube, and verified buyers.",
             color: "bg-blue-500"
         },
         {
             icon: Zap,
-            title: "Compare Prices",
-            desc: "We check all major apps to find you the lowest price instantly.",
+            title: "Real-Time Lowest Price",
+            desc: "Instant price comparison across Amazon, Walmart, Best Buy, and 1,000+ stores.",
             color: "bg-emerald-500"
         },
         {
-            icon: ShieldCheck,
-            title: "Spam Protection",
-            desc: "Keep your personal email clean. Use your unique @compro.app ID.",
+            icon: Lock,
+            title: "Privacy First",
+            desc: "No ads. No tracking. We don't sell your data. Your history stays yours.",
             color: "bg-purple-500"
         }
     ];
@@ -79,22 +77,13 @@ export const Home = () => {
                         <span className="text-xl font-bold font-serif tracking-tight text-ink">Compro</span>
                     </div>
                     <div>
-                        {user ? (
-                            <motion.div
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => navigate('/profile')}
-                                className="w-8 h-8 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs font-bold text-slate-600 cursor-pointer"
-                            >
-                                {user.email?.charAt(0).toUpperCase()}
-                            </motion.div>
-                        ) : (
-                            <button
-                                onClick={() => navigate('/login')}
-                                className="text-sm font-bold text-ink hover:text-slate-600 transition-colors"
-                            >
-                                Sign In
-                            </button>
-                        )}
+                        {/* Guest / No Auth UI */}
+                        <div
+                            onClick={() => navigate('/vault')}
+                            className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 cursor-pointer hover:bg-slate-200 transition-colors"
+                        >
+                            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Guest`} alt="Guest" className="w-full h-full rounded-full opacity-80" />
+                        </div>
                     </div>
                 </div>
             </header>
@@ -109,13 +98,13 @@ export const Home = () => {
                 >
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald/10 text-emerald text-[11px] font-bold tracking-wide uppercase mb-6 border border-emerald/20">
                         <span className="w-2 h-2 rounded-full bg-emerald animate-pulse"></span>
-                        Now Live for Everyone
+                        The Truth Before You Buy
                     </div>
                     <h1 className="text-4xl font-extrabold font-serif text-ink mb-4 leading-tight tracking-tight">
-                        Your Personal<br />Shopping Assistant
+                        Cut Through The Noise<br />Get The Truth
                     </h1>
-                    <p className="text-slate-500 text-base leading-relaxed max-w-[280px] mx-auto">
-                        Track orders, compare prices, and get rewards. All in one place.
+                    <p className="text-slate-500 text-base leading-relaxed max-w-[320px] mx-auto">
+                        Unbiased reviews from Reddit & YouTube, AI summaries, and real-time lowest price comparison. One click away.
                     </p>
                 </motion.div>
 

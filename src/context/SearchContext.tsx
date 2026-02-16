@@ -16,7 +16,7 @@ interface SearchContextType {
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [activeTab, setActiveTab] = useState('food');
+    const [activeTab, setActiveTab] = useState('shop');
     const [searchTerm, setSearchTerm] = useState('');
     const [searchTrigger, setSearchTrigger] = useState('');
 

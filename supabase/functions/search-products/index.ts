@@ -13,7 +13,7 @@ serve(async (req: Request) => {
 
     try {
         const { query } = await req.json()
-        const serpApiKey = Deno.env.get('SERPAPI_KEY')
+        const searchApiKey = Deno.env.get('SEARCHAPI_KEY')
 
         if (!query) {
             throw new Error('Query parameter is required')
@@ -21,21 +21,36 @@ serve(async (req: Request) => {
 
         let results: any[] = []
 
-        if (serpApiKey) {
-            console.log(`Searching SerpApi for: ${query}`)
-            const response = await fetch(`https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(query)}&api_key=${serpApiKey}&google_domain=google.in&gl=in&hl=en`)
+        if (searchApiKey) {
+            console.log(`Searching SearchApi.io for: ${query}`)
+            // construct the URL for Google Shopping
+            const url = new URL('https://www.searchapi.io/api/v1/search')
+            url.searchParams.set('engine', 'google_shopping')
+            url.searchParams.set('q', query)
+            url.searchParams.set('api_key', searchApiKey)
+            url.searchParams.set('location', 'India')
+            url.searchParams.set('google_domain', 'google.in')
+            url.searchParams.set('gl', 'in')
+            url.searchParams.set('hl', 'en')
+
+            const response = await fetch(url.toString())
+
+            if (!response.ok) {
+                throw new Error(`SearchApi error: ${response.status} ${response.statusText}`)
+            }
+
             const data = await response.json()
 
             if (data.shopping_results) {
                 results = data.shopping_results.map((item: any) => ({
-                    id: item.product_id || item.position,
+                    id: item.product_id || String(Math.random()),
                     term: query,
                     name: item.title,
                     image: item.thumbnail,
                     platforms: [
                         {
                             name: item.source || 'Google Shopping',
-                            price: item.extract_price || item.price,
+                            price: item.price ? (typeof item.price === 'string' ? parseFloat(item.price.replace(/[^0-9.]/g, '')) : item.price) : 0,
                             deliveryTime: item.delivery || '3-5 days',
                             rating: item.rating || 4.5,
                             deliveryFee: 0,
@@ -48,7 +63,7 @@ serve(async (req: Request) => {
                 })).slice(0, 5)
             }
         } else {
-            console.log('No SERPAPI_KEY, returning mock data')
+            console.log('No SEARCHAPI_KEY, returning mock data')
             // Fallback Mock Data
             results = [
                 {

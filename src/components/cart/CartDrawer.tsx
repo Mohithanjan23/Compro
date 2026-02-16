@@ -3,11 +3,10 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+
 
 export const CartDrawer = () => {
     const { items, isOpen, setIsOpen, removeFromCart, updateQuantity, total, checkout } = useCart();
-    const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
 
@@ -111,14 +110,9 @@ export const CartDrawer = () => {
                                 <button
                                     disabled={loading}
                                     onClick={async () => {
-                                        if (!user) {
-                                            setIsOpen(false);
-                                            navigate('/login');
-                                            return;
-                                        }
                                         setLoading(true);
                                         try {
-                                            await checkout(user.id);
+                                            await checkout();
                                             setIsOpen(false);
                                             navigate('/order-success');
                                         } catch (error) {

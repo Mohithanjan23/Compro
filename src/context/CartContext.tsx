@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { supabase } from '../lib/supabaseClient';
+
 
 export interface CartItem {
     id: string;
@@ -17,7 +17,7 @@ interface CartContextType {
     removeFromCart: (id: string) => void;
     updateQuantity: (id: string, delta: number) => void;
     clearCart: () => void;
-    checkout: (userId: string) => Promise<void>;
+    checkout: () => Promise<void>;
     total: number;
     isOpen: boolean;
     setIsOpen: (open: boolean) => void;
@@ -75,28 +75,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-    const checkout = async (userId: string) => {
-        if (!userId) throw new Error("User not logged in");
+    const checkout = async () => {
         if (items.length === 0) return;
 
-        // Create order entries
-        const orderPromises = items.map(item => {
-            return supabase?.from('orders').insert({
-                user_id: userId,
-                brand: item.brand,
-                item_name: item.name,
-                price: item.price.toString(),
-                status: 'processed',
-                logo_bg: 'bg-black', // Default or derived from item
-                logo_text: 'text-white'
-            });
-        });
+        // In a real no-auth flow, we might capture email/phone during checkout
+        // For now, we'll just simulate a successful order processing
 
-        if (orderPromises) {
-            await Promise.all(orderPromises);
-            clearCart();
-            localStorage.removeItem('compro-cart');
-        }
+        console.log("Processing guest checkout for items:", items);
+
+        // Optional: We could still write to Supabase if we enable anonymous inserts
+        // or just rely on local state/success screen for the MVP
+
+        // Simulating network delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        clearCart();
+        localStorage.removeItem('compro-cart');
     };
 
     return (
