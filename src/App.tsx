@@ -1,4 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './lib/queryClient';
+import { CartProvider } from './context/CartContext';
 import { Layout } from './components/layout/Layout';
 import { Home } from './screens/Home';
 import { Results } from './screens/Results';
@@ -62,11 +65,15 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <AuthProvider>
-      <SearchProvider>
-        <RouterProvider router={router} />
-      </SearchProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <SearchProvider>
+          <CartProvider>
+            <RouterProvider router={router} />
+          </CartProvider>
+        </SearchProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

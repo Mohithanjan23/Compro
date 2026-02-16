@@ -5,14 +5,14 @@ import {
     Utensils,
     Car,
     TrendingUp,
-    Filter,
-    ChevronRight,
-    Menu,
+    ArrowRight,
     Zap,
-    ArrowRight
+    ShieldCheck,
+    Mail
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSearch } from '../context/SearchContext';
+import { motion } from 'framer-motion';
 
 export const Home = () => {
     const navigate = useNavigate();
@@ -26,153 +26,222 @@ export const Home = () => {
     } = useSearch();
 
     const categories = [
-        { id: 'food', label: 'Food', icon: Utensils },
-        { id: 'shop', label: 'Shopping', icon: ShoppingBag },
-        { id: 'ride', label: 'Rides', icon: Car },
+        { id: 'food', label: 'Food', icon: Utensils, color: 'bg-orange-500' },
+        { id: 'shop', label: 'Shopping', icon: ShoppingBag, color: 'bg-blue-500' },
+        { id: 'ride', label: 'Rides', icon: Car, color: 'bg-black' },
     ];
 
-    const history = ['Biryani', 'iPhone 15', 'Cab to Airport'];
+    const features = [
+        {
+            icon: Mail,
+            title: "Track Everything",
+            desc: "Connect your email to auto-track every order in one place.",
+            color: "bg-blue-500"
+        },
+        {
+            icon: Zap,
+            title: "Compare Prices",
+            desc: "We check all major apps to find you the lowest price instantly.",
+            color: "bg-emerald-500"
+        },
+        {
+            icon: ShieldCheck,
+            title: "Spam Protection",
+            desc: "Keep your personal email clean. Use your unique @flash.co ID.",
+            color: "bg-purple-500"
+        }
+    ];
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0 }
+    };
 
     return (
-        <>
+        <div className="min-h-screen bg-slate-50/50 pb-24">
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-ceramic/80 backdrop-blur-xl border-b border-slate-200/50 transition-all duration-300">
+            <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
                 <div className="max-w-md mx-auto px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-gradient-to-br from-ink to-slate-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-ceramic-md">
-                            <span className="font-serif text-xl italic pt-1">C</span>
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white">
+                            <Zap size={18} className="fill-current" />
                         </div>
-                        <span className="text-2xl font-serif italic tracking-wide text-ink pt-1">Compro</span>
+                        <span className="text-xl font-bold tracking-tight text-ink">Flash.co</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div>
                         {user ? (
-                            <div onClick={() => navigate('/profile')} className="bg-amber-100/80 backdrop-blur-sm text-amber-700 font-bold px-3 py-1.5 rounded-full text-xs flex items-center gap-1.5 border border-amber-200/50 shadow-sm cursor-pointer hover:bg-amber-200/80 transition-colors">
-                                <div className="w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center text-[10px] text-white">C</div>
-                                450
-                            </div>
+                            <motion.div
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => navigate('/profile')}
+                                className="w-8 h-8 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs font-bold text-slate-600 cursor-pointer"
+                            >
+                                {user.email?.charAt(0).toUpperCase()}
+                            </motion.div>
                         ) : (
                             <button
                                 onClick={() => navigate('/login')}
-                                className="bg-ink text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg shadow-ink/20 hover:bg-slate-800 transition-all active:scale-95"
+                                className="text-sm font-bold text-ink hover:text-slate-600 transition-colors"
                             >
                                 Sign In
                             </button>
                         )}
-                        <button className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm active:scale-95 transition-transform">
-                            <Menu size={18} className="text-slate-600" />
-                        </button>
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-md mx-auto px-6 pt-6 mb-24">
-
-                {/* Hero Text */}
-                <div className="mb-8 text-center pt-2 animate-in fade-in zoom-in duration-500">
-                    <h1 className="text-5xl font-serif italic text-ink mb-2 leading-[0.9]">
-                        Compare<br /><span className="text-emerald"> & Save.</span>
+            <main className="max-w-md mx-auto px-6 pt-10">
+                {/* Hero Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="text-center mb-10"
+                >
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald/10 text-emerald text-[11px] font-bold tracking-wide uppercase mb-6 border border-emerald/20">
+                        <span className="w-2 h-2 rounded-full bg-emerald animate-pulse"></span>
+                        Now Live for Everyone
+                    </div>
+                    <h1 className="text-4xl font-extrabold text-ink mb-4 leading-tight tracking-tight">
+                        Your Personal<br />Shopping Assistant
                     </h1>
-                    <p className="text-slate-500 font-medium text-sm">The intelligent way to shop across apps.</p>
-                </div>
+                    <p className="text-slate-500 text-base leading-relaxed max-w-[280px] mx-auto">
+                        Track orders, compare prices, and get rewards. All in one place.
+                    </p>
+                </motion.div>
 
-                {/* Search Bar */}
-                <div className="relative mb-8 group z-20">
-
-                    <div className="absolute inset-0 bg-gradient-to-r from-azure/20 to-emerald/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div className="relative bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-2 flex items-center gap-2 transition-transform group-hover:-translate-y-1">
-                        <Search className="text-slate-400 ml-3" />
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => {
-                                setSearchTerm(e.target.value);
-                                setSearchTrigger(e.target.value);
-                            }}
-                            placeholder={`Try "${activeTab === 'food' ? 'Biryani' : activeTab === 'ride' ? 'Airport' : 'Nike Shoes'}..."`}
-                            className="flex-1 bg-transparent border-none outline-none text-ink placeholder:text-slate-300 font-medium h-12"
-                            onFocus={() => {
-                                if (searchTerm) navigate('/results');
-                            }}
-                        />
-                        <button
-                            onClick={() => navigate('/results')}
-                            className="bg-ink text-white p-3 rounded-xl hover:bg-slate-800 transition-colors"
-                        >
-                            <ArrowRight size={20} />
-                        </button>
+                {/* Search Interaction */}
+                <div className="relative mb-12 z-20">
+                    {/* Floating Categories */}
+                    <div className="flex justify-center gap-4 mb-6">
+                        {categories.map(cat => {
+                            const Icon = cat.icon;
+                            const isActive = activeTab === cat.id;
+                            return (
+                                <motion.button
+                                    key={cat.id}
+                                    onClick={() => setActiveTab(cat.id)}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className={`flex flex-col items-center gap-2 transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}
+                                >
+                                    <motion.div
+                                        animate={{
+                                            backgroundColor: isActive ? '#000000' : '#ffffff',
+                                            color: isActive ? '#ffffff' : '#94a3b8',
+                                            boxShadow: isActive ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                                        }}
+                                        className={`w-12 h-12 rounded-2xl flex items-center justify-center border ${isActive ? 'border-transparent' : 'border-slate-100'}`}
+                                    >
+                                        <Icon size={20} />
+                                    </motion.div>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{cat.label}</span>
+                                </motion.button>
+                            );
+                        })}
                     </div>
-                </div>
 
-                {/* Category Tabs */}
-                <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-                    {categories.map(cat => {
-                        const Icon = cat.icon;
-                        const isActive = activeTab === cat.id;
-                        return (
-                            <button
-                                key={cat.id}
-                                onClick={() => setActiveTab(cat.id)}
-                                className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${isActive
-                                    ? 'bg-ink text-white shadow-lg shadow-ink/20 scale-105'
-                                    : 'bg-white text-slate-400 hover:bg-slate-50'
-                                    }`}
+                    {/* Search Bar */}
+                    <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="group relative"
+                    >
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                        <div className="relative bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-2 pl-4 flex items-center">
+                            <Search className="text-slate-400" size={20} />
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setSearchTrigger(e.target.value);
+                                }}
+                                placeholder={`Search for ${activeTab === 'food' ? 'Biryani' : activeTab === 'ride' ? 'a ride' : 'iPhone 15'}...`}
+                                className="flex-1 bg-transparent border-none outline-none text-ink placeholder:text-slate-300 font-medium h-12 pl-3 text-lg"
+                                onFocus={() => {
+                                    if (searchTerm) navigate('/results');
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') navigate('/results');
+                                }}
+                            />
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => navigate('/results')}
+                                className="bg-black text-white w-12 h-12 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-colors shadow-lg shadow-black/20"
                             >
-                                <Icon size={16} className={isActive ? 'text-emerald-400' : ''} />
-                                {cat.label}
-                            </button>
-                        );
-                    })}
+                                <ArrowRight size={20} />
+                            </motion.button>
+                        </div>
+                    </motion.div>
                 </div>
 
-                {/* Trending / History */}
-                <div className="animate-in slide-in-from-bottom-5 duration-500 delay-100">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Trending Near You</h3>
-                        <Filter size={14} className="text-slate-400" />
-                    </div>
+                {/* Features Grid */}
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="show"
+                    className="grid grid-cols-1 gap-4 mb-12"
+                >
+                    {features.map((feature, i) => (
+                        <motion.div
+                            key={i}
+                            variants={itemVariants}
+                            className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-4 hover:border-slate-200 transition-colors"
+                        >
+                            <div className={`w-10 h-10 rounded-xl ${feature.color} flex items-center justify-center text-white shadow-md shrink-0`}>
+                                <feature.icon size={20} />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-ink mb-1">{feature.title}</h3>
+                                <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                                    {feature.desc}
+                                </p>
+                            </div>
+                        </motion.div>
+                    ))}
+                </motion.div>
 
-                    <div className="space-y-3">
-                        {history.map((term, i) => (
-                            <button
-                                key={i}
+                {/* Trending Section */}
+                <div className="mb-8">
+                    <div className="flex items-center gap-2 mb-4 px-1">
+                        <TrendingUp size={16} className="text-emerald" />
+                        <h3 className="text-xs font-bold text-slate-900 uppercase tracking-widest">Trending Now</h3>
+                    </div>
+                    <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6">
+                        {['iPhone 15 Pro', 'Nike Air Jordan', 'Sony WH-1000XM5', 'Nothing Phone 2'].map((item, i) => (
+                            <motion.button
+                                key={item}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.4 + (i * 0.1) }}
                                 onClick={() => {
-                                    setSearchTerm(term);
-                                    setSearchTrigger(term);
+                                    setSearchTerm(item);
+                                    setSearchTrigger(item);
                                     navigate('/results');
                                 }}
-                                className="w-full bg-white hover:bg-slate-50 p-4 rounded-2xl flex items-center justify-between group transition-all border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200 active:scale-[0.98]"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="shrink-0 bg-white border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 shadow-sm whitespace-nowrap hover:border-black hover:text-black transition-colors"
                             >
-                                <div className="flex items-center gap-4">
-                                    <div className="w-8 h-8 rounded-full bg-emerald/10 text-emerald flex items-center justify-center">
-                                        <TrendingUp size={16} />
-                                    </div>
-                                    <span className="text-slate-700 font-medium group-hover:text-ink">{term}</span>
-                                </div>
-                                <ChevronRight size={18} className="text-slate-300 group-hover:text-slate-500 transition-transform group-hover:translate-x-1" />
-                            </button>
+                                {item}
+                            </motion.button>
                         ))}
-                    </div>
-
-                    {/* Connect Accounts Card */}
-                    <div className="mt-8 bg-gradient-to-br from-ink to-slate-800 rounded-3xl p-6 relative overflow-hidden shadow-2xl shadow-ink/20 group cursor-pointer">
-                        <div className="relative z-10">
-                            <h4 className="font-serif italic text-2xl text-white mb-2">Connect Accounts</h4>
-                            <p className="text-xs text-slate-300 mb-4 max-w-[200px] leading-relaxed">
-                                Link your email to auto-detect orders and apply hidden coupons.
-                            </p>
-                            <button
-                                onClick={() => navigate('/profile')}
-                                className="bg-white text-ink px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-ceramic transition-colors shadow-lg"
-                            >
-                                Connect Now
-                            </button>
-                        </div>
-                        <div className="absolute -right-4 -bottom-8 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
-                            <Zap size={140} className="text-white rotate-12" />
-                        </div>
                     </div>
                 </div>
             </main>
-        </>
+        </div>
     );
 };

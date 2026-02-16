@@ -8,6 +8,7 @@ interface AuthContextType {
     session: Session | null;
     loading: boolean;
     signIn: (email?: string, password?: string) => Promise<void>;
+    signUp: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
     isMock: boolean;
 }
@@ -74,6 +75,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
+    const signUp = async (email: string, password: string) => {
+        if (supabase) {
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+            });
+            if (error) {
+                alert(error.message);
+                throw error;
+            }
+            if (data.session) {
+                setSession(data.session);
+                setUser(data.user);
+            } else if (data.user) {
+                alert('Sign up successful! Please check your email for confirmation link.');
+            }
+        } else {
+            setUser(MOCK_USER);
+            alert('Mock Sign Up Successful');
+        }
+    };
+
     const signOut = async () => {
         if (supabase) {
             await supabase.auth.signOut();
@@ -88,6 +111,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             session,
             loading,
             signIn,
+            signUp,
             signOut,
             isMock: !supabase
         }}>

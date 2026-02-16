@@ -5,21 +5,28 @@ import { Mail, Lock, Zap, Chrome } from 'lucide-react';
 
 export const Login = () => {
     const navigate = useNavigate();
-    const { signIn, isMock } = useAuth();
+    const { signIn, signUp, isMock } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isSignUp, setIsSignUp] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         try {
-            // If isMock is true, this will just simulate a login
-            // If isMock is false, we need to implement real Supabase login in AuthContext
-            await signIn(email, password);
-            navigate('/');
+            if (isSignUp) {
+                await signUp(email, password);
+                // Stay on login page or navigate if auto-login works
+                // If signUp didn't throw, check if we need to navigate or just show success
+                // AuthContext's signUp handles session set if auto-login
+                navigate('/');
+            } else {
+                await signIn(email, password);
+                navigate('/');
+            }
         } catch {
-            alert('Login failed');
+            // Alert handled in context
         } finally {
             setLoading(false);
         }
@@ -36,8 +43,8 @@ export const Login = () => {
                     <div className="w-16 h-16 bg-gradient-to-br from-azure to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-azure/30">
                         <Zap size={32} className="text-white fill-white" />
                     </div>
-                    <h1 className="text-2xl font-serif italic text-ink mb-1">Welcome Back</h1>
-                    <p className="text-sm text-slate-400">Sign in to track your orders</p>
+                    <h1 className="text-2xl font-serif italic text-ink mb-1">{isSignUp ? 'Create Account' : 'Welcome Back'}</h1>
+                    <p className="text-sm text-slate-400">{isSignUp ? 'Sign up to start tracking prices' : 'Sign in to track your orders'}</p>
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-4">
@@ -76,11 +83,21 @@ export const Login = () => {
                         disabled={loading}
                         className="w-full py-4 bg-ink text-white rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-ink/20 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
                     >
-                        {loading ? 'Signing in...' : 'Sign In'}
+                        {loading ? (isSignUp ? 'Creating Account...' : 'Signing in...') : (isSignUp ? 'Sign Up' : 'Sign In')}
                     </button>
                 </form>
 
-                <div className="mt-8 pt-6 border-t border-slate-100">
+                <div className="mt-6 text-center">
+                    <button
+                        type="button"
+                        onClick={() => setIsSignUp(!isSignUp)}
+                        className="text-sm text-slate-500 hover:text-ink font-medium underline underline-offset-2"
+                    >
+                        {isSignUp ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up'}
+                    </button>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-slate-100">
                     <button
                         type="button"
                         className="w-full py-3.5 border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"

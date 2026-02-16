@@ -120,10 +120,13 @@ export const useComparisonEngine = ({ searchTerm, category }: UseComparisonEngin
                         realData = data as Record<string, unknown>[];
                         usedMock = false;
                     } else {
-                        console.warn('Edge Function Error or Empty:', error);
+                        console.warn('Edge Function Error:', error);
+                        if (error?.message?.includes('SERPAPI_KEY')) {
+                            console.error('CRITICAL: SERPAPI_KEY is missing in Supabase Edge Function Secrets.');
+                        }
                     }
                 } catch (err) {
-                    console.warn('Failed to fetch real data, using mock', err);
+                    console.warn('Failed to fetch real data, using mock. Details:', err);
                 }
             }
 

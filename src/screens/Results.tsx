@@ -1,8 +1,9 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Zap, ArrowLeft, X } from 'lucide-react';
+import { Search, ArrowLeft, X } from 'lucide-react';
 import { useSearch } from '../context/SearchContext';
 import { ResultCard } from '../components/ResultCard';
+import { ComparisonLoader } from '../components/ComparisonLoader';
 
 type SortOption = 'best' | 'price' | 'time';
 
@@ -104,17 +105,7 @@ export const Results = () => {
 
             <main className="max-w-md mx-auto px-4 pt-6 pb-24">
                 {/* Loading State */}
-                {loading && (
-                    <div className="flex flex-col items-center justify-center py-12 space-y-6">
-                        <div className="relative">
-                            <div className="w-16 h-16 border-[4px] border-azure/20 border-t-azure rounded-full animate-spin"></div>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <Zap size={20} className="text-azure animate-pulse" />
-                            </div>
-                        </div>
-                        <p className="text-slate-400 font-medium animate-pulse text-sm">Scanning {activeTab} platforms...</p>
-                    </div>
-                )}
+                {loading && <ComparisonLoader />}
 
                 {/* Results List */}
                 {!loading && sortedResults.length > 0 && (

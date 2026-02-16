@@ -1,6 +1,4 @@
-// NOTE: You must set SERPAPI_KEY in your Supabase project secrets:
-// npx supabase secrets set SERPAPI_KEY=your_key_here
-// @ts-expect-error Deno std module
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
@@ -8,96 +6,72 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// @ts-expect-error Deno serve type
-serve(async (req) => {
+serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }
 
     try {
         const { query } = await req.json()
-        // @ts-expect-error Deno.env
-        const SERPAPI_KEY = Deno.env.get('SERPAPI_KEY')
-
-        if (!SERPAPI_KEY) {
-            throw new Error('SERPAPI_KEY is missing in Edge Function secrets.')
-        }
+        const serpApiKey = Deno.env.get('SERPAPI_KEY')
 
         if (!query) {
-            throw new Error('Query parameter is required.')
+            throw new Error('Query parameter is required')
         }
 
-        console.log(`Searching for: ${query}`)
+        let results: any[] = []
 
-        // reliable Google Shopping Search via SerpApi
-        const url = new URL('https://serpapi.com/search')
-        url.searchParams.append('engine', 'google_shopping')
-        url.searchParams.append('q', query)
-        url.searchParams.append('api_key', SERPAPI_KEY)
-        url.searchParams.append('google_domain', 'google.co.in') // Localize for India
-        url.searchParams.append('gl', 'in')
-        url.searchParams.append('hl', 'en')
-        url.searchParams.append('currency', 'INR')
+        if (serpApiKey) {
+            console.log(`Searching SerpApi for: ${query}`)
+            const response = await fetch(`https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(query)}&api_key=${serpApiKey}&google_domain=google.in&gl=in&hl=en`)
+            const data = await response.json()
 
-        const response = await fetch(url.toString())
-        const data = await response.json()
-
-        if (data.error) {
-            throw new Error(data.error)
-        }
-
-        // Normalize Data for App
-        const shoppingResults = data.shopping_results || []
-
-        // Transform to App's Schema (ServiceResult)
-        // Since this is a "Comparison" engine, we group by product if possible,
-        // but Google Shopping returns individual offers.
-        // For this demo, check "stores" in results or treat each result as a potential match.
-
-        // Simplified: Take top 3 distinct items or best offers
-        interface SerpItem { product_id?: string; title?: string; thumbnail?: string; source?: string; price?: string; delivery?: string; rating?: number; link?: string }
-        const processedItems = shoppingResults.slice(0, 5).map((item: SerpItem, index: number) => ({
-            id: item.product_id || `serp-${index}`,
-            term: query,
-            name: item.title,
-            image: item.thumbnail,
-            platforms: [
+            if (data.shopping_results) {
+                results = data.shopping_results.map((item: any) => ({
+                    id: item.product_id || item.position,
+                    term: query,
+                    name: item.title,
+                    image: item.thumbnail,
+                    platforms: [
+                        {
+                            name: item.source || 'Google Shopping',
+                            price: item.extract_price || item.price,
+                            deliveryTime: item.delivery || '3-5 days',
+                            rating: item.rating || 4.5,
+                            deliveryFee: 0,
+                            taxes: 0,
+                            discountAmount: 0,
+                            color: 'bg-blue-500',
+                            link: item.link
+                        }
+                    ]
+                })).slice(0, 5)
+            }
+        } else {
+            console.log('No SERPAPI_KEY, returning mock data')
+            // Fallback Mock Data
+            results = [
                 {
-                    name: item.source || 'Google Store',
-                    price: item.price ? parseFloat(item.price.replace(/[^0-9.]/g, '')) : 0,
-                    deliveryTime: item.delivery || 'Standard',
-                    rating: item.rating || 0,
-                    deliveryFee: 0, // Often included or unknown
-                    taxes: 0,
-                    link: item.link, // Save link for "Order Now"
-                    color: 'bg-blue-600'
-                },
-                // Mocking a competitor for comparison effect if "stores" data is missing
-                {
-                    name: 'Competitor',
-                    price: (item.price ? parseFloat(item.price.replace(/[^0-9.]/g, '')) : 1000) * 1.05, // +5%
-                    deliveryTime: 'slower',
-                    rating: 4.0,
-                    deliveryFee: 50,
-                    taxes: 0,
-                    color: 'bg-gray-500'
+                    id: 'mock-1',
+                    term: query,
+                    name: `${query} (Mock Result)`,
+                    image: 'https://images.unsplash.com/photo-1581235720704-06d3acfcb363?w=200&h=200&fit=crop',
+                    platforms: [
+                        { name: 'Amazon', price: 999, deliveryTime: 'Tomorrow', rating: 4.5, deliveryFee: 0, taxes: 0, discountAmount: 100, color: 'bg-yellow-500', link: '#' },
+                        { name: 'Flipkart', price: 949, deliveryTime: '2 Days', rating: 4.3, deliveryFee: 40, taxes: 0, discountAmount: 0, color: 'bg-blue-500', link: '#' }
+                    ]
                 }
-            ],
-            category: 'shop',
-            bestPrice: 0, // Computed on client
-            fastestTime: 0, // Computed on client
-            savings: 0 // Computed on client
-        }))
+            ]
+        }
 
         return new Response(
-            JSON.stringify(processedItems),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+            JSON.stringify(results),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
         )
-    } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
+    } catch (error: any) {
         return new Response(
-            JSON.stringify({ error: message }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+            JSON.stringify({ error: error.message || 'Unknown error' }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
         )
     }
 })
