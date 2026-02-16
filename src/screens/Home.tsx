@@ -154,15 +154,21 @@ export const Home = () => {
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
+                                    // Auto-switch category based on keywords
+                                    const term = e.target.value.toLowerCase();
+                                    if (['burger', 'pizza', 'biryani', 'pasta', 'sushi', 'food', 'hungry', 'eat'].some(k => term.includes(k))) {
+                                        setActiveTab('food');
+                                    } else if (['iphone', 'samsung', 'nike', 'shoe', 'laptop', 'phone', 'buy', 'shop'].some(k => term.includes(k))) {
+                                        setActiveTab('shop');
+                                    } else if (['ride', 'cab', 'uber', 'ola', 'airport', 'travel'].some(k => term.includes(k))) {
+                                        setActiveTab('ride');
+                                    }
                                     setSearchTrigger(e.target.value);
                                 }}
                                 placeholder={`Search for ${activeTab === 'food' ? 'Biryani' : activeTab === 'ride' ? 'a ride' : 'iPhone 15'}...`}
                                 className="flex-1 bg-transparent border-none outline-none text-ink placeholder:text-slate-300 font-medium h-12 pl-3 text-lg"
-                                onFocus={() => {
-                                    if (searchTerm) navigate('/results');
-                                }}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter') navigate('/results');
+                                    if (e.key === 'Enter' && searchTerm) navigate('/results');
                                 }}
                             />
                             <motion.button
