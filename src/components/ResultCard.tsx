@@ -29,7 +29,7 @@ export const ResultCard = ({ item }: { item: ServiceResult }) => {
                     className="w-16 h-16 rounded-xl object-cover shadow-sm border border-slate-100 shrink-0"
                 />
                 <div className="flex-1 min-w-0">
-                    <h2 className="text-lg font-medium text-ink leading-tight mb-1">
+                    <h2 className="text-lg font-medium font-serif text-ink leading-tight mb-1">
                         {item.name}
                     </h2>
                 </div>
@@ -40,7 +40,7 @@ export const ResultCard = ({ item }: { item: ServiceResult }) => {
                 <div className="bg-emerald/10 rounded-xl p-3 flex items-center gap-3 mb-6">
                     <Wallet className="text-emerald fill-emerald/20" size={20} />
                     <span className="text-sm font-bold text-emerald">
-                        Flash AI just saved you ₹{item.savings.toLocaleString()}
+                        Compro AI just saved you ₹{item.savings.toLocaleString()}
                     </span>
                 </div>
             )}

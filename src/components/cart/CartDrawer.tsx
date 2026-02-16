@@ -33,7 +33,7 @@ export const CartDrawer = () => {
                         className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white z-[70] shadow-2xl flex flex-col"
                     >
                         <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white text-ink">
-                            <h2 className="text-lg font-bold flex items-center gap-2">
+                            <h2 className="text-lg font-bold font-serif flex items-center gap-2">
                                 <ShoppingBag className="text-emerald-500" />
                                 Your Compro Cart
                             </h2>

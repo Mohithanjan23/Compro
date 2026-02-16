@@ -47,7 +47,7 @@ export const Home = () => {
         {
             icon: ShieldCheck,
             title: "Spam Protection",
-            desc: "Keep your personal email clean. Use your unique @flash.co ID.",
+            desc: "Keep your personal email clean. Use your unique @compro.app ID.",
             color: "bg-purple-500"
         }
     ];
@@ -76,7 +76,7 @@ export const Home = () => {
                         <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white">
                             <Zap size={18} className="fill-current" />
                         </div>
-                        <span className="text-xl font-bold tracking-tight text-ink">Flash.co</span>
+                        <span className="text-xl font-bold font-serif tracking-tight text-ink">Compro</span>
                     </div>
                     <div>
                         {user ? (
@@ -111,7 +111,7 @@ export const Home = () => {
                         <span className="w-2 h-2 rounded-full bg-emerald animate-pulse"></span>
                         Now Live for Everyone
                     </div>
-                    <h1 className="text-4xl font-extrabold text-ink mb-4 leading-tight tracking-tight">
+                    <h1 className="text-4xl font-extrabold font-serif text-ink mb-4 leading-tight tracking-tight">
                         Your Personal<br />Shopping Assistant
                     </h1>
                     <p className="text-slate-500 text-base leading-relaxed max-w-[280px] mx-auto">

@@ -62,7 +62,7 @@ export const ComparisonLoader = () => {
                     })}
                 </div>
             </div>
-            <p className="mt-8 text-slate-400 text-xs animate-pulse">Powered by Flash AI</p>
+            <p className="mt-8 text-slate-400 text-xs animate-pulse font-serif italic">Powered by Compro AI</p>
         </div>
     );
 };
